@@ -1,8 +1,6 @@
 # Effect of Dim Lighting on Walking and Obstacle Navigation
 
-This pipeline processes mobile EEG recorded during walking and obstacle navigation
-and analyses how lighting and obstacle conditions affect neural
-activity in young and older adults.
+This repository contains the EEG and behavioural analysis code for a study investigating the effects of dim lighting on walking and obstacle navigation in young and older adults. The pipeline preprocesses mobile EEG data and analyses how lighting and obstacle conditions influence neural activity, walking speed, and cadence.
 
 **No participant data is included in this repository**. The scripts read from local
 data folders that are not committed. Paths are set at the top of each script and in
