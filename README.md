@@ -1,6 +1,6 @@
 # Effect of Dim Lighting on Walking and Obstacle Navigation
 
-Processes mobile EEG recorded during walking and obstacle navigation
+This pipeline processes mobile EEG recorded during walking and obstacle navigation
 and analyses how lighting and obstacle conditions affect neural
 activity in young and older adults.
 
