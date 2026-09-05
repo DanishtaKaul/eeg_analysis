@@ -1,5 +1,4 @@
-# Cadence mixed model for EEG gait data (age x light + obstacle).
-
+# Cadence mixed model for EEG gait data (age x light + obstacle)
 library(readr)
 library(lme4)
 library(lmerTest)
@@ -11,13 +10,11 @@ library(see)
 library(car)
 library(nlme)
 # =========================================================
-# CADENCE
+# CADENCE WITH OBSTACLE
 # =========================================================
 
 cadence_df <- read_csv("eeg_gait_cadence_with_obstacle_final.csv")
 
-# Exclude PID 49
-cadence_df <- cadence_df[cadence_df$pid != "PID 49", ]
 
 # Check structure
 str(cadence_df)
@@ -126,95 +123,77 @@ m_cadence_nlme_varLightObs <- lme(
   data = cadence_df
 )
 
-# Compare against varLight only
-anova(m_cadence_nlme_varLight, m_cadence_nlme_varLightObs)
+anova(m_cadence_nlme_varObs, m_cadence_nlme_varLightObs)
 
-# Compare AICs
 AIC(m_cadence_nlme_base, m_cadence_nlme_varLight, m_cadence_nlme_varObs, m_cadence_nlme_varLightObs)
 
-# =========================================================
-# FINAL MODEL: nlme with varIdent by light
-# =========================================================
-
-summary(m_cadence_nlme_varLight)
-anova(m_cadence_nlme_varLight)
 
 # =========================================================
-# EFFECT SIZES 
+# Final variance structure: varIdent by obstacle
 # =========================================================
 
-eta2p_age <- (6.945 * 1) / (6.945 * 1 + 38)
-cat("eta2p age:", eta2p_age, "\n")
-
-eta2p_light <- (19.455 * 2) / (19.455 * 2 + 433)
-cat("eta2p light:", eta2p_light, "\n")
-
-eta2p_obstacle <- (27.086 * 3) / (27.086 * 3 + 433)
-cat("eta2p obstacle:", eta2p_obstacle, "\n")
-
-eta2p_agelight <- (2.448 * 2) / (2.448 * 2 + 433)
-cat("eta2p age:light:", eta2p_agelight, "\n")
+summary(m_cadence_nlme_varObs)
+anova(m_cadence_nlme_varObs)   # supplies F-values and DenDF for partial eta-squared below
 
 # =========================================================
-# ESTIMATED MARGINAL MEANS AND POST-HOCS
+# Partial eta-squared
 # =========================================================
 
-# Age
-emmeans(m_cadence_nlme_varLight, ~ age)
+eta2p_age       <- (2.778  * 1) / (2.778  * 1 + 39)
+eta2p_light     <- (12.071 * 2) / (12.071 * 2 + 444)
+eta2p_obstacle  <- (35.573 * 3) / (35.573 * 3 + 444)
+eta2p_agelight  <- (2.140  * 2) / (2.140  * 2 + 444)
 
-# Light pairwise
-emmeans(m_cadence_nlme_varLight, pairwise ~ light, adjust = "bonferroni")
+cat("eta2p age:      ", round(eta2p_age, 4),      "\n")
+cat("eta2p light:    ", round(eta2p_light, 4),    "\n")
+cat("eta2p obstacle: ", round(eta2p_obstacle, 4), "\n")
+cat("eta2p age:light:", round(eta2p_agelight, 4), "\n")
 
+# Age main effect 
+emmeans(m_cadence_nlme_varObs, ~ age)
+
+# Light: estimated means + pairwise contrasts, Bonferroni-corrected
+emmeans(m_cadence_nlme_varObs, pairwise ~ light, adjust = "bonferroni")
 
 # =========================================================
-# CUSTOM OBSTACLE CONTRASTS (matching EEG post-hoc structure)
-# Obstacle levels: 1=expected_absent, 2=expected_present, 
-#                  3=unexpected_absent, 4=unexpected_present
+# Obstacle contrasts (planned, matching EEG post-hoc structure)
+# Levels: 1=expected_absent, 2=expected_present,
+#         3=unexpected_absent, 4=unexpected_present
 # =========================================================
 
-emm_obs_custom <- emmeans(m_cadence_nlme_varLight, ~ obstacle)
+emm_obs_custom <- emmeans(m_cadence_nlme_varObs, ~ obstacle)
 
-# 5 planned contrasts matching EEG post-hoc structure, Bonferroni corrected
+# 5 planned contrasts, Bonferroni-corrected
 custom_contrasts <- contrast(emm_obs_custom, list(
   "present - absent" = c(-0.5, 0.5, -0.5, 0.5),
-  "UP - EP" = c(0, -1, 0, 1),
-  "UA - EA" = c(-1, 0, 1, 0),
-  "UP - absent" = c(-0.5, 0, -0.5, 1),
-  "EP - absent" = c(-0.5, 1, -0.5, 0)
+  "UP - EP"          = c(0, -1, 0, 1),
+  "UA - EA"          = c(-1, 0, 1, 0),
+  "UP - absent"      = c(-0.5, 0, -0.5, 1),
+  "EP - absent"      = c(-0.5, 1, -0.5, 0)
 ), adjust = "bonferroni")
-
 custom_contrasts
 
-# Get collapsed means for present and absent (with SE)
+# Collapsed present/absent means (with SE)
 collapsed_means <- contrast(emm_obs_custom, list(
-  "absent" = c(0.5, 0, 0.5, 0),
+  "absent"  = c(0.5, 0, 0.5, 0),
   "present" = c(0, 0.5, 0, 0.5)
 ))
 collapsed_means
-# =========================================================
-# EXPORT RESULTS TO CSV
-# =========================================================
 
-# ANOVA results + eta squared
-anova_res <- as.data.frame(anova(m_cadence_nlme_varLight))
+# Export results to CSV - all from final model m_cadence_nlme_varObs
+
+anova_res <- as.data.frame(anova(m_cadence_nlme_varObs))
 anova_res$Effect <- rownames(anova_res)
-anova_res$eta2p <- c(NA, eta2p_age, eta2p_light, eta2p_obstacle, eta2p_agelight)
+anova_res$eta2p  <- c(NA, eta2p_age, eta2p_light, eta2p_obstacle, eta2p_agelight)
 write.csv(anova_res, "eeg_cadence_obstacle_anova_results.csv", row.names = FALSE)
 
-# EMM for age
-emm_age <- as.data.frame(emmeans(m_cadence_nlme_varLight, ~ age))
+emm_age <- as.data.frame(emmeans(m_cadence_nlme_varObs, ~ age))
 write.csv(emm_age, "eeg_cadence_obstacle_emm_age.csv", row.names = FALSE)
 
-# EMM pairwise for light
-emm_light <- emmeans(m_cadence_nlme_varLight, pairwise ~ light, adjust = "bonferroni")
-write.csv(as.data.frame(emm_light$emmeans), "eeg_cadence_obstacle_emm_light_means.csv", row.names = FALSE)
+emm_light <- emmeans(m_cadence_nlme_varObs, pairwise ~ light, adjust = "bonferroni")
+write.csv(as.data.frame(emm_light$emmeans),   "eeg_cadence_obstacle_emm_light_means.csv",     row.names = FALSE)
 write.csv(as.data.frame(emm_light$contrasts), "eeg_cadence_obstacle_emm_light_contrasts.csv", row.names = FALSE)
 
-# Save obstacle means
-write.csv(as.data.frame(emm_obs_custom), "eeg_cadence_obstacle_emm_obstacle_means.csv", row.names = FALSE)
-
-# Save collapsed means
-write.csv(as.data.frame(collapsed_means), "eeg_cadence_obstacle_collapsed_means.csv", row.names = FALSE)
-# Save custom contrasts
-custom_contrasts_df <- as.data.frame(custom_contrasts)
-write.csv(custom_contrasts_df, "eeg_cadence_obstacle_custom_contrasts.csv", row.names = FALSE)
+write.csv(as.data.frame(emm_obs_custom),   "eeg_cadence_obstacle_emm_obstacle_means.csv", row.names = FALSE)
+write.csv(as.data.frame(collapsed_means),  "eeg_cadence_obstacle_collapsed_means.csv",    row.names = FALSE)
+write.csv(as.data.frame(custom_contrasts), "eeg_cadence_obstacle_custom_contrasts.csv",   row.names = FALSE)
