@@ -135,7 +135,6 @@ AIC(m_speed_nlme_base, m_speed_nlme_varLight, m_speed_nlme_varObs, m_speed_nlme_
 
 # =========================================================
 # Final variance structure: varIdent by light
-# Selected on lowest AIC
 # =========================================================
 
 summary(m_speed_nlme_varLight)
