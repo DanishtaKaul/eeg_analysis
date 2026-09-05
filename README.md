@@ -60,7 +60,7 @@ Run after the main-effect tests, on the clusters they find.
 
 Walking speed and cadence computed from the same trials used in the EEG analysis.
 
-Run steps 1 to 5 of the gait pipeline (the `gait_analysis` repository) first to produce the time series these scripts read.
+Run steps 1 to 5 of the gait pipeline [gait_analysis](https://github.com/DanishtaKaul/gait_analysis) first to produce the time series these scripts read.
 
 - `eeg_final_dataset_for_gait_analysis_with_obstacle.py` - build the set of EEG-matched gait trials.
 - `eeg_calculate_speed_cadence_with_obstacle.py` - compute speed and cadence for each participant and condition.
