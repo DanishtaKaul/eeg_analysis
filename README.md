@@ -1,4 +1,4 @@
-# Effect of Dim Lighting on Walking and Obstacle Navigation
+# Environmental Demands Outweigh Age Effects in Cortical Dynamics During Walking
 
 This repository contains the EEG and behavioural analysis code for a study investigating the effects of dim lighting on walking and obstacle navigation in young and older adults. The pipeline preprocesses mobile EEG data and analyses how lighting and obstacle conditions influence neural activity, walking speed, and cadence.
 
