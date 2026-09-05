@@ -1,18 +1,17 @@
 
-
 # -*- coding: utf-8 -*-
 """
-Compute speed and cadence from VALID EEG trials only.
+Compute speed and cadence from valid EEG trials only.
 
 Pipeline:
 1) Get valid EEG trials (suspicious removed + EEG-matched only)
 2) Extract individual strides and cadence per trial
 3) Remove entire trials failing cadence threshold
-4) Remove individual bad strides 
+4) Remove individual bad strides (speed, stride length, stride time)
 5) Remove trials with < 2 strides remaining
-6) Pool per PID x light x obstacle: mean speed across surviving strides,
-   mean cadence across surviving trials
+6) Pool surviving strides per PID x light x obstacle
 7) Save speed_mean and cadence per PID x light x obstacle
+
 """
 
 from helper_functions import extract_light, extract_forewarn, get_existence_from_timeseries
@@ -22,6 +21,7 @@ import pandas as pd
 import numpy as np
 import os
 import sys
+from scipy.signal import butter, filtfilt
 sys.path.insert(0, r"D:\Gait_Analysis")
 
 
@@ -46,6 +46,30 @@ Old = {
 # ======================================================
 # HELPER FUNCTIONS
 # ======================================================
+
+FILTER_CUTOFF_HZ = 6.0
+FILTER_ORDER = 2
+
+
+FILTERED_CHANNELS = ["lfoot_ap"]
+
+
+def apply_lowpass(ts):
+    """Low-pass filter the position channels of a trial in place.
+
+    Filtering is applied across the whole trial
+    """
+    fs = 1.0 / float(np.median(np.diff(ts.time)))
+    b, a = butter(FILTER_ORDER, FILTER_CUTOFF_HZ / (fs / 2.0), btype="low")
+
+    for channel in FILTERED_CHANNELS:
+        if np.isnan(ts.data[channel]).any():
+            return False
+
+    for channel in FILTERED_CHANNELS:
+        ts.data[channel] = filtfilt(b, a, ts.data[channel])
+
+    return True
 
 
 def get_hs_times(ts):
@@ -99,11 +123,11 @@ def compute_cadence(ts):
             "Non-positive walking duration in cadence calculation.")
 
     total_steps = len(hs_L) + len(hs_R)
-    return (total_steps / duration) * 60
+    return ((total_steps - 1) / duration) * 60
 
 
 # ======================================================
-# OUTLIER THRESHOLDS
+# THRESHOLDS 
 # ======================================================
 
 stride_thresholds = {
@@ -134,6 +158,9 @@ for i, ts_path in enumerate(valid_eeg_trials, 1):
         print(f"[{i}/{len(valid_eeg_trials)}] Processing {os.path.basename(ts_path)}")
 
     ts = ktk.load(ts_path)
+    if not apply_lowpass(ts):
+        raise ValueError(
+            f"Missing samples in {os.path.basename(ts_path)} - cannot filter.")
 
     pid = os.path.basename(os.path.dirname(ts_path))
 
