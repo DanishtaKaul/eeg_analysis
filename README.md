@@ -48,6 +48,26 @@ Run after the main-effect tests, on the clusters they find.
 - `line_plot_cluster_test_obstacle_unexpected_present_all_absent.py` - compare unexpected-present trials against absent trials.
 - `line_plot_cluster_test_obstacle_expected_present_all_absent.py` - compare expected-present trials against absent trials.
 
+## Cluster plots
+
+Run after the post-hoc tests. These produce the individual panels that the figure scripts below assemble.
+
+- `inspect_plot_clusters.py` - per-cluster TFRs and topomaps for the age t-test results.
+- `inspect_plot_light_obstacle_main_f.py` - per-cluster TFRs and topomaps for the light and obstacle main effects.
+- `plot_all_clusters_one_tfr.py` - one TFR per effect and phase, with every significant cluster outlined.
+
+## Figures
+
+Run in this order. Steps 1 and 2 build the TFR/topomap blocks, the later scripts open those blocks and add the line plots.
+
+1. `assemble_composites.py` - light blocks for Figures 5 and 7.
+2. `assemble_composites_obstacle.py` - obstacle blocks for Figures 6 and 8.
+3. `assemble_composites_age.py` - Figure 4 (age, preparation phase).
+4. `assemble_light_final_figure.py` - Figure 5 (light, preparation phase).
+5. `assemble_obstacle_prep_final.py` - Figure 6 (obstacle, preparation phase).
+6. `assemble_light_final_figure_reset.py` - Figure 7 (light, reset phase).
+7. `assemble_obstacle_reset_final.py` - Figure 8 (obstacle, reset phase).
+
 ## Supplementary analyses
 
 - `age_light_mixed_anova.py` - test how age and lighting affect regional band power.
