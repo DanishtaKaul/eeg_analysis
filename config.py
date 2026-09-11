@@ -5,7 +5,7 @@ from collections import defaultdict
 debug = True
 
 condition_preparation_median_times = defaultdict(list)
-
+# PID 16 and PID 40 were excluded from the EEG analysis
 experiments = [
     r"E:\PID 3",    
     r"E:\PID 4",    
