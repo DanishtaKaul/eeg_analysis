@@ -6,6 +6,8 @@ This repository contains the EEG and behavioural analysis code for a study inves
 data folders that are not committed. Paths are set at the top of each script and in
 `config.py` and `cluster_config.py`.
 
+**Before running the pipeline**: move the Python scripts (including __init__.py) into a folder named scripts/.
+
 ## Main pipeline
 
 Entry point: `main.py`. It uses `navigation.py` to find each participant's files and
