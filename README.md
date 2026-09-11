@@ -6,6 +6,8 @@ This repository contains the EEG and behavioural analysis code for a study inves
 data folders that are not committed. Paths are set at the top of each script and in
 `config.py` and `cluster_config.py`.
 
+**Data**: the data this code reads is deposited on Zenodo: https://doi.org/10.5281/zenodo.22705594
+
 **Before running the pipeline**: move the Python scripts (including `__init__.py`) into a folder named `scripts/`, since several scripts import from it.
 
 **Environment**: the conda environment used for this analysis is in `environment.yml`.
