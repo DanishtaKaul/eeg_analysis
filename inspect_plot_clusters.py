@@ -5,8 +5,8 @@ Inspector for the age main-effect cluster-permutation results (t-tests).
 For each NPZ:
     * Load stats and metadata, rebuild the cluster masks.
     * Identify significant clusters 
-    * Save a TFR with significance contours,
-      a topomap of mean t over the cluster window, and a topomap at the peak.
+    * Save a TFR with significance contours, and
+      a topomap of mean t over the cluster window (and peak topomap, diagnostic only).
 
 Outputs go to OUTPUT_ROOT/<parent_folder>/<file_stem>__<segment>__<comparison>/.
 Supplies panels A and B of Figure 4.
