@@ -8,6 +8,8 @@ data folders that are not committed. Paths are set at the top of each script and
 
 **Before running the pipeline**: move the Python scripts (including `__init__.py`) into a folder named `scripts/`, since several scripts import from it.
 
+**Environment**: the conda environment used for this analysis is in `environment.yml`.
+
 ## Main pipeline
 
 Entry point: `main.py`. It uses `navigation.py` to find each participant's files and
