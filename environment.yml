@@ -1,0 +1,21 @@
+name: mne-dependencies
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.12
+  - mne=1.8.0
+  - autoreject=0.4.3
+  - numpy=1.26.0
+  - scipy=1.14.1
+  - pandas=2.2.3
+  - matplotlib-base=3.9.2
+  - pingouin
+  - tslearn
+  - pytorch
+  - torchaudio
+  - torchvision
+  - cpuonly
+  - pip
+  - pip:
+      - mne-icalabel==0.7.0
